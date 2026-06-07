@@ -6,6 +6,16 @@ class Product:
         self.__price = price
         self.quantity = quantity
 
+    def __str__(self):
+        return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
+
+    def __add__(self, other):
+        # умножаем цену на количество и в конце плюсуем их
+        total_self = self.price * self.quantity
+        total_other = other.price * other.quantity
+
+        return total_self + total_other
+
     @property
     def price(self):
         return self.__price
@@ -49,6 +59,15 @@ class Category:
         # считаем количество продуктов внутри категории
         Category.products_count += len(products)
 
+    def __str__(self):
+        # берем именно количество в каждом продукте отдельно и суммируем их
+        total_quantity = sum(product.quantity for product in self._products)
+        return f"{self.name}, количество продуктов: {total_quantity} шт."
+
+    def __iter__(self):
+        # сделал свой итератор для --- for product in category: ---
+        return CategoryIterator(self._products)
+
     def add_product(self, new_product):
         # проверяем есть ли у нас уже такой продукт
         for product in self._products:
@@ -65,13 +84,24 @@ class Category:
 
     @property
     def products(self):
-        # создаем переменную куда будем добавлять строки для отображения продуктов
-        product_str = ""
+        # возвращает строковое представление всех товаров в категории
+        # каждый объект Product преобразуется в строку через его __str__
+        return "\n".join(str(product) for product in self._products)
 
-        # преобразуем каждый продукт в строку под наш формат
-        for product in self._products:
-            result = f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт.\n"
-            product_str += result
 
-        # возвращаем готовые строки
-        return product_str
+class CategoryIterator:
+
+    def __init__(self, products: list[Product]):
+        self.products = products
+        self.index = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.index < len(self.products):
+            product = self.products[self.index]
+            self.index += 1
+            return product
+        else:
+            raise StopIteration

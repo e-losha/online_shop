@@ -81,7 +81,7 @@ def test_products_getter(my_category):
         "Арбуз, 300 руб. Остаток: 10 шт.\n"
         "Мандарин, 25 руб. Остаток: 25 шт.\n"
         "Яблоко, 55 руб. Остаток: 15 шт.\n"
-        "Банан, 45 руб. Остаток: 5 шт.\n"
+        "Банан, 45 руб. Остаток: 5 шт."
     )
 
 
@@ -101,3 +101,30 @@ def test_add_product(my_category):
     assert my_category._products[4].price == 400
     assert my_category._products[4].quantity == 10
     assert len(my_category._products) == 5
+
+
+def test_product_str():
+    new_product1 = Product("Арбуз", "зелено-красный", 500, 3)
+
+    assert str(new_product1) == "Арбуз, 500 руб. Остаток: 3 шт."
+
+
+def test_product_add_basic():
+    new_product1 = Product("Арбуз", "зелено-красный", 500, 3)
+    new_product2 = Product("Киви", "зеленый", 400, 10)
+
+    assert new_product1 + new_product2 == 5500
+
+
+def test_product_add_zero():
+    new_product1 = Product("Арбуз", "зелено-красный", 500, 0)
+    new_product2 = Product("Киви", "зеленый", 400, 10)
+
+    assert new_product1 + new_product2 == 4000
+
+
+def test_product_add_commutative():
+    new_product1 = Product("Арбуз", "зелено-красный", 500, 2)
+    new_product2 = Product("Киви", "зеленый", 400, 10)
+
+    assert new_product1 + new_product2 == new_product2 + new_product1
