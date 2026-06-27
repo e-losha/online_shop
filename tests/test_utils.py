@@ -1,11 +1,11 @@
 import json
 
 from src.main import Category, Product
-from src.utils import read_json, create_objects_from_json
+from src.utils import create_objects_from_json, read_json
 
 
 def test_read_json(tmp_path):
-    json_file = tmp_path / 'test.json'
+    json_file = tmp_path / "test.json"
 
     my_data = [
         {
@@ -63,7 +63,8 @@ def test_create_objects_from_json():
     assert category.name == "Смартфоны"
     assert category.description == (
         "Смартфоны, как средство не только коммуникации, "
-        "но и получение дополнительных функций для удобства жизни")
+        "но и получение дополнительных функций для удобства жизни"
+    )
 
     assert len(category._products) == 1
 

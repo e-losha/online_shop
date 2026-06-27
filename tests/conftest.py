@@ -1,6 +1,6 @@
 import pytest
 
-from src.main import Category, Product, Smartphone, LawnGrass
+from src.main import Category, LawnGrass, Product, Smartphone
 
 
 @pytest.fixture()
@@ -25,11 +25,20 @@ def reset_counters():
 
 @pytest.fixture()
 def my_product_smartphone():
-    product1 = Smartphone("Iphone 15", "512GB, Gray space", 210000.0, 8, 'efficient', '15', '512GB', 'Gray')
+    product1 = Smartphone(
+        "Iphone 15",
+        "512GB, Gray space",
+        210000.0,
+        8,
+        "efficient",
+        "15",
+        "512GB",
+        "Gray",
+    )
     return product1
 
 
 @pytest.fixture()
 def my_product_lawngrass():
-    product1 = LawnGrass('Трава', 'газонная', 500, 20, 'Poland', '3 weeks', 'Green')
+    product1 = LawnGrass("Трава", "газонная", 500, 20, "Poland", "3 weeks", "Green")
     return product1

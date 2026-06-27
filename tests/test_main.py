@@ -1,4 +1,4 @@
-from src.main import Category, Product, Smartphone, LawnGrass
+from src.main import Category, LawnGrass, Product, Smartphone
 
 
 def test_product_init(my_product):
@@ -131,18 +131,44 @@ def test_product_add_commutative():
 
 
 def test_product_add_same_product():
-    new_product1 = Smartphone("Iphone 15", "512GB, Gray space", 210000.0, 8, 'efficient', '15', '512GB', 'Gray')
-    new_product2 = Smartphone("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14, 'efficient', 'Note 11', '1024GB',
-                              'Синий')
+    new_product1 = Smartphone(
+        "Iphone 15",
+        "512GB, Gray space",
+        210000.0,
+        8,
+        "efficient",
+        "15",
+        "512GB",
+        "Gray",
+    )
+    new_product2 = Smartphone(
+        "Xiaomi Redmi Note 11",
+        "1024GB, Синий",
+        31000.0,
+        14,
+        "efficient",
+        "Note 11",
+        "1024GB",
+        "Синий",
+    )
 
     assert new_product1 + new_product2 == 2114000
 
 
 def test_product_add_diff_products():
-    new_product1 = Smartphone("Iphone 15", "512GB, Gray space", 210000.0, 8, 'efficient', '15', '512GB', 'Gray')
-    new_product2 = LawnGrass('Трава', 'газонная', 500, 20, 'Poland', '3 weeks', 'Green')
+    new_product1 = Smartphone(
+        "Iphone 15",
+        "512GB, Gray space",
+        210000.0,
+        8,
+        "efficient",
+        "15",
+        "512GB",
+        "Gray",
+    )
+    new_product2 = LawnGrass("Трава", "газонная", 500, 20, "Poland", "3 weeks", "Green")
 
-    assert TypeError('Нельзя складывать разные товары')
+    assert TypeError("Нельзя складывать разные товары")
 
 
 def test_product_smartphone_init(my_product_smartphone):
@@ -150,17 +176,17 @@ def test_product_smartphone_init(my_product_smartphone):
     assert my_product_smartphone.description == "512GB, Gray space"
     assert my_product_smartphone.price == 210000.0
     assert my_product_smartphone.quantity == 8
-    assert my_product_smartphone.efficiency == 'efficient'
-    assert my_product_smartphone.model == '15'
-    assert my_product_smartphone.memory == '512GB'
-    assert my_product_smartphone.color == 'Gray'
+    assert my_product_smartphone.efficiency == "efficient"
+    assert my_product_smartphone.model == "15"
+    assert my_product_smartphone.memory == "512GB"
+    assert my_product_smartphone.color == "Gray"
 
 
 def test_product_lawngrass_init(my_product_lawngrass):
-    assert my_product_lawngrass.name == 'Трава'
-    assert my_product_lawngrass.description == 'газонная'
+    assert my_product_lawngrass.name == "Трава"
+    assert my_product_lawngrass.description == "газонная"
     assert my_product_lawngrass.price == 500
     assert my_product_lawngrass.quantity == 20
-    assert my_product_lawngrass.country == 'Poland'
-    assert my_product_lawngrass.germination_period == '3 weeks'
-    assert my_product_lawngrass.color == 'Green'
+    assert my_product_lawngrass.country == "Poland"
+    assert my_product_lawngrass.germination_period == "3 weeks"
+    assert my_product_lawngrass.color == "Green"
