@@ -10,6 +10,10 @@ class Product:
         return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
 
     def __add__(self, other):
+        # проверяем является ли объект other такого же класса, что и self
+        if type(self) is not type(other):
+            raise TypeError('Нельзя складывать разные товары')
+
         # умножаем цену на количество и в конце плюсуем их
         total_self = self.price * self.quantity
         total_other = other.price * other.quantity
@@ -69,6 +73,10 @@ class Category:
         return CategoryIterator(self._products)
 
     def add_product(self, new_product):
+        # проверяем, что new_product является экземпляром Product или его наследника
+        if not isinstance(new_product, Product):
+            raise TypeError('Можно добавлять только объекты Product и его наследников')
+
         # проверяем есть ли у нас уже такой продукт
         for product in self._products:
             # если нашли совпадение - количество плюсуем, цену берем максимальную из двух
@@ -105,3 +113,24 @@ class CategoryIterator:
             return product
         else:
             raise StopIteration
+
+
+class Smartphone(Product):
+
+    def __init__(self, name: str, description: str, price: float, quantity: int, efficiency: str, model: str,
+                 memory: str, color: str):
+        super().__init__(name, description, price, quantity)
+        self.efficiency = efficiency
+        self.model = model
+        self.memory = memory
+        self.color = color
+
+
+class LawnGrass(Product):
+
+    def __init__(self, name: str, description: str, price: float, quantity: int, country: str, germination_period: str,
+                 color: str):
+        super().__init__(name, description, price, quantity)
+        self.country = country
+        self.germination_period = germination_period
+        self.color = color

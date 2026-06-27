@@ -32,10 +32,9 @@ python manage.py runserver
 
 ## Использование:
 
-1. В main.py находятся классы
+1. В main.py находятся классы: Product, Category, а так же классы наследники от Product: Smartphone(Product) и LawnGrass(Product).
 2. В utils.py находятся функции чтения файлов JSON
 3. В test_main.py, conftest.py находятся тесты и фикстуры.
-
 
 ## Тестирование
 
