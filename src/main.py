@@ -1,38 +1,235 @@
-class Product:
-    name: str
-    description: str
-    price: float
-    quantity: int
+from abc import ABC, abstractmethod
+from itertools import product
 
-    def __init__(self, name: str, description: str, price: float, quantity: int):
+
+class BaseProduct(ABC):
+
+    @abstractmethod
+    def __str__(self) -> str:
+        pass
+
+
+class BaseEntity(ABC):
+
+    @abstractmethod
+    def __str__(self) -> str:
+        pass
+
+
+class MixinLog:
+
+    def __init__(
+        self, name: str, description: str, price: float, quantity: int
+    ) -> None:
+        super().__init__()
+        print(repr(self))
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.name!r}, {self.description!r}, {self.price!r}, {self.quantity!r})"
+
+
+class Product(MixinLog, BaseProduct):
+
+    def __init__(
+        self, name: str, description: str, price: float, quantity: int
+    ) -> None:
         self.name = name
         self.description = description
-        self.price = price
+        self.__price = price
         self.quantity = quantity
+        super().__init__(name, description, price, quantity)
 
-    def __str__(self):
-        return f"Продукт: {self.name}({self.description}), {self.price} руб., количество: {self.quantity}"
+    def __str__(self) -> str:
+        return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
 
-    def __repr__(self):
-        return (
-            f"Product(name='{self.name}', price={self.price}, quantity={self.quantity})"
-        )
+    def __add__(self, other: "Product") -> float:
+        if type(self) is not type(other):
+            raise TypeError("Нельзя складывать разные товары")
+
+        total_self = self.price * self.quantity
+        total_other = other.price * other.quantity
+
+        return total_self + total_other
+
+    @property
+    def price(self) -> float:
+        return self.__price
+
+    @price.setter
+    def price(self, new_price: float) -> None:
+        if new_price <= 0:
+            print("Цена не должна быть нулевая или отрицательная")
+            return
+
+        if new_price < self.__price:
+            user_answer = (
+                input("Указанная цена ниже текущей. Продолжить? (y/n): ")
+                .strip()
+                .lower()
+            )
+            if user_answer != "y":
+                return
+
+        self.__price = new_price
+
+    @classmethod
+    def new_product(cls, product_dict: dict[str, str | float | int]) -> "Product":
+        """Создаёт товар из словаря с параметрами товара."""
+        return cls(**product_dict)
 
 
-class Category:
-    name: str
-    description: str
-    products: list
+class Category(BaseEntity):
     category_count = 0
     products_count = 0
 
-    def __init__(self, name: str, description: str, products: list[Product]):
+    def __init__(self, name: str, description: str, products: list[Product]) -> None:
         self.name = name
         self.description = description
-        self.products = products
+        self._products = list(products)
 
         Category.category_count += 1
         Category.products_count += len(products)
 
-    def __str__(self):
-        return f"Категория: {self.name}({self.description}), продукты: {self.products})"
+    def __str__(self) -> str:
+        total_quantity = sum(product.quantity for product in self._products)
+        return f"{self.name}, количество продуктов: {total_quantity} шт."
+
+    def __iter__(self) -> "CategoryIterator":
+        return CategoryIterator(self._products)
+
+    def add_product(self, new_product: "Product") -> None:
+        """Проверяем, что new_product является экземпляром Product или его наследника"""
+        if not isinstance(new_product, Product):
+            raise TypeError("Можно добавлять только объекты Product и его наследников")
+
+        for product in self._products:
+            if product.name == new_product.name:
+                product.quantity += new_product.quantity
+                # при объединении одинаковых товаров сохраняем более высокую цену
+                product.price = max(product.price, new_product.price)
+                break
+        else:
+            self._products.append(new_product)
+
+            Category.products_count += 1
+
+    @property
+    def products(self) -> str:
+        """Возвращает строковое представление всех товаров в категории"""
+        return "\n".join(str(product) for product in self._products)
+
+
+class CategoryIterator:
+
+    def __init__(self, products: list[Product]) -> None:
+        self.products = products
+        self.index = 0
+
+    def __iter__(self) -> "CategoryIterator":
+        return self
+
+    def __next__(self) -> "Product":
+        if self.index < len(self.products):
+            product = self.products[self.index]
+            self.index += 1
+            return product
+        else:
+            raise StopIteration
+
+
+class Smartphone(Product):
+
+    def __init__(
+        self,
+        name: str,
+        description: str,
+        price: float,
+        quantity: int,
+        efficiency: str,
+        model: str,
+        memory: str,
+        color: str,
+    ) -> None:
+        super().__init__(name, description, price, quantity)
+        self.efficiency = efficiency
+        self.model = model
+        self.memory = memory
+        self.color = color
+
+
+class LawnGrass(Product):
+
+    def __init__(
+        self,
+        name: str,
+        description: str,
+        price: float,
+        quantity: int,
+        country: str,
+        germination_period: str,
+        color: str,
+    ) -> None:
+        super().__init__(name, description, price, quantity)
+        self.country = country
+        self.germination_period = germination_period
+        self.color = color
+
+
+class Order(BaseEntity):
+
+    def __init__(self, product: Product, quantity: int) -> None:
+        self.product = product
+        self.quantity = quantity
+
+    def __str__(self) -> str:
+        return f"Заказ: {self.product}, количество: {self.quantity}, итоговая стоимость: {self.product.price * self.quantity}"
+
+
+if __name__ == "__main__":
+    product1 = Product(
+        "Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5
+    )
+    product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
+    product3 = Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14)
+
+    print(product1.name)
+    print(product1.description)
+    print(product1.price)
+    print(product1.quantity)
+
+    print(product2.name)
+    print(product2.description)
+    print(product2.price)
+    print(product2.quantity)
+
+    print(product3.name)
+    print(product3.description)
+    print(product3.price)
+    print(product3.quantity)
+
+    category1 = Category(
+        "Смартфоны",
+        "Смартфоны, как средство не только коммуникации, но и получения дополнительных функций для удобства жизни",
+        [product1, product2, product3],
+    )
+
+    print(category1.name == "Смартфоны")
+    print(category1.description)
+    print(len(category1.products))
+    print(category1.category_count)
+    print(category1.products_count)
+
+    product4 = Product('55" QLED 4K', "Фоновая подсветка", 123000.0, 7)
+    category2 = Category(
+        "Телевизоры",
+        "Современный телевизор, который позволяет наслаждаться просмотром, станет вашим другом и помощником",
+        [product4],
+    )
+
+    print(category2.name)
+    print(category2.description)
+    print(len(category2.products))
+    print(category2.products)
+
+    print(Category.category_count)
+    print(Category.products_count)
