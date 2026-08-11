@@ -1,4 +1,15 @@
-from src.main import Category, Product
+import pytest
+
+from src.main import (
+    BaseEntity,
+    BaseProduct,
+    Category,
+    LawnGrass,
+    MixinLog,
+    Order,
+    Product,
+    Smartphone,
+)
 
 
 def test_product_init(my_product):
@@ -111,7 +122,7 @@ def test_product_str():
 
 def test_product_add_basic():
     new_product1 = Product("Арбуз", "зелено-красный", 500, 3)
-    new_product2 = Product("Киви", "зеленый", 400, 10)
+    new_product2 = Product("Арбуз", "зелено-красный", 400, 10)
 
     assert new_product1 + new_product2 == 5500
 
@@ -128,3 +139,119 @@ def test_product_add_commutative():
     new_product2 = Product("Киви", "зеленый", 400, 10)
 
     assert new_product1 + new_product2 == new_product2 + new_product1
+
+
+def test_product_add_same_product():
+    new_product1 = Smartphone(
+        "Iphone 15",
+        "512GB, Gray space",
+        210000.0,
+        8,
+        "efficient",
+        "15",
+        "512GB",
+        "Gray",
+    )
+    new_product2 = Smartphone(
+        "Xiaomi Redmi Note 11",
+        "1024GB, Синий",
+        31000.0,
+        14,
+        "efficient",
+        "Note 11",
+        "1024GB",
+        "Синий",
+    )
+
+    assert new_product1 + new_product2 == 2114000
+
+
+def test_product_add_diff_products():
+    new_product1 = Smartphone(
+        "Iphone 15",
+        "512GB, Gray space",
+        210000.0,
+        8,
+        "efficient",
+        "15",
+        "512GB",
+        "Gray",
+    )
+    new_product2 = LawnGrass("Трава", "газонная", 500, 20, "Poland", "3 weeks", "Green")
+
+    assert TypeError("Нельзя складывать разные товары")
+
+
+def test_product_smartphone_init(my_product_smartphone):
+    assert my_product_smartphone.name == "Iphone 15"
+    assert my_product_smartphone.description == "512GB, Gray space"
+    assert my_product_smartphone.price == 210000.0
+    assert my_product_smartphone.quantity == 8
+    assert my_product_smartphone.efficiency == "efficient"
+    assert my_product_smartphone.model == "15"
+    assert my_product_smartphone.memory == "512GB"
+    assert my_product_smartphone.color == "Gray"
+
+
+def test_product_lawngrass_init(my_product_lawngrass):
+    assert my_product_lawngrass.name == "Трава"
+    assert my_product_lawngrass.description == "газонная"
+    assert my_product_lawngrass.price == 500
+    assert my_product_lawngrass.quantity == 20
+    assert my_product_lawngrass.country == "Poland"
+    assert my_product_lawngrass.germination_period == "3 weeks"
+    assert my_product_lawngrass.color == "Green"
+
+
+def test_base_product():
+    with pytest.raises(TypeError):
+        BaseProduct("Арбуз", "зелено-красный", 500, 3)
+
+
+def test_product_logging(capsys):
+    product = Product("Арбуз", "зелено-красный", 500, 3)
+    captured = capsys.readouterr()
+    assert "Product('Арбуз', 'зелено-красный', 500, 3)" in captured.out
+
+
+def test_product_repr():
+    new_product1 = Product("Арбуз", "зелено-красный", 500, 3)
+    assert repr(new_product1) == "Product('Арбуз', 'зелено-красный', 500, 3)"
+
+
+def test_smartphone_logging(capsys):
+    smartphone = Smartphone(
+        "Iphone 15",
+        "512GB, Gray space",
+        210000.0,
+        8,
+        "efficient",
+        "15",
+        "512GB",
+        "Gray",
+    )
+    captured = capsys.readouterr()
+    assert "Smartphone('Iphone 15', '512GB, Gray space', 210000.0, 8)" in captured.out
+
+
+def test_base_entity():
+    with pytest.raises(TypeError):
+        BaseEntity()
+
+
+def test_order_init():
+    new_product1 = Product("Арбуз", "зелено-красный", 500, 3)
+    new_order1 = Order(new_product1, 3)
+
+    assert new_order1.product == new_product1
+    assert new_order1.quantity == 3
+
+
+def test_order_str():
+    new_product1 = Product("Арбуз", "зелено-красный", 500, 3)
+    new_order1 = Order(new_product1, 5)
+
+    assert (
+        str(new_order1)
+        == "Заказ: Арбуз, 500 руб. Остаток: 3 шт., количество: 5, итоговая стоимость: 2500"
+    )

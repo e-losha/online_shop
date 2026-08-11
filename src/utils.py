@@ -1,10 +1,11 @@
 import json
 import os
+from pathlib import Path
 
 from src.main import Category, Product
 
 
-def read_json(path: str) -> list[dict]:
+def read_json(path: str | Path) -> list[dict]:
     # превращаем относительный путь в полный абсолютный путь,
     # чтобы Python точно понимал, где лежит файл
     full_path = os.path.abspath(path)
