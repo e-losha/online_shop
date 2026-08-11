@@ -1,4 +1,15 @@
-from src.main import Category, LawnGrass, Product, Smartphone
+import pytest
+
+from src.main import (
+    BaseEntity,
+    BaseProduct,
+    Category,
+    LawnGrass,
+    MixinLog,
+    Order,
+    Product,
+    Smartphone,
+)
 
 
 def test_product_init(my_product):
@@ -190,3 +201,57 @@ def test_product_lawngrass_init(my_product_lawngrass):
     assert my_product_lawngrass.country == "Poland"
     assert my_product_lawngrass.germination_period == "3 weeks"
     assert my_product_lawngrass.color == "Green"
+
+
+def test_base_product():
+    with pytest.raises(TypeError):
+        BaseProduct("Арбуз", "зелено-красный", 500, 3)
+
+
+def test_product_logging(capsys):
+    product = Product("Арбуз", "зелено-красный", 500, 3)
+    captured = capsys.readouterr()
+    assert "Product('Арбуз', 'зелено-красный', 500, 3)" in captured.out
+
+
+def test_product_repr():
+    new_product1 = Product("Арбуз", "зелено-красный", 500, 3)
+    assert repr(new_product1) == "Product('Арбуз', 'зелено-красный', 500, 3)"
+
+
+def test_smartphone_logging(capsys):
+    smartphone = Smartphone(
+        "Iphone 15",
+        "512GB, Gray space",
+        210000.0,
+        8,
+        "efficient",
+        "15",
+        "512GB",
+        "Gray",
+    )
+    captured = capsys.readouterr()
+    assert "Smartphone('Iphone 15', '512GB, Gray space', 210000.0, 8)" in captured.out
+
+
+def test_base_entity():
+    with pytest.raises(TypeError):
+        BaseEntity()
+
+
+def test_order_init():
+    new_product1 = Product("Арбуз", "зелено-красный", 500, 3)
+    new_order1 = Order(new_product1, 3)
+
+    assert new_order1.product == new_product1
+    assert new_order1.quantity == 3
+
+
+def test_order_str():
+    new_product1 = Product("Арбуз", "зелено-красный", 500, 3)
+    new_order1 = Order(new_product1, 5)
+
+    assert (
+        str(new_order1)
+        == "Заказ: Арбуз, 500 руб. Остаток: 3 шт., количество: 5, итоговая стоимость: 2500"
+    )
